@@ -93,12 +93,12 @@ namespace vn {
     template <typename T>
     using identity = typename detail::identity_<T>::type;
 
-    template <typename R, typename C, typename ...Args>
-    R return_type(R(C::*)(Args...));      
-        
-    template <typename R, typename ...Args>
-    R return_type(R(*)(Args...));
-    
+    //template <typename R, typename C, typename ...Args>
+    //R return_type(R(C::*)(Args...));      
+    //    
+    //template <typename R, typename ...Args>
+    //R return_type(R(*)(Args...));
+    //
     //namespace detail {    
     //       
     //    template <int...Ns>

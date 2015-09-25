@@ -44,6 +44,7 @@ namespace vn {
             return *this;       // ugly static_cast of &C::operator() to guarantee that it has the right signature                          
         }
                 
+        constexpr bool operator==(hasher const& other) const noexcept { return seed == other.seed; }
         constexpr explicit operator std::size_t() const noexcept { return seed; }        
         friend constexpr std::size_t hash_value(hasher const& h) noexcept { return h.seed; }    
     };
