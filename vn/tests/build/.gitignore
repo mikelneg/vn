@@ -1,0 +1,5 @@
+# ignore everything in the build folder
+*
+
+# except our .gitignore file
+!.gitignore
