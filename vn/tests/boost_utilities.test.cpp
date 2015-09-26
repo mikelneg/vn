@@ -43,11 +43,12 @@ TEST_CASE("boost_utilities","[boost_utilities]") {
     {
         boost_hasher b;
 
-        CHECK((    b == boost_hasher{}    ));   // initializes properly             
+        CHECK((    b == boost_hasher{}    ));   // default-initializes
         
         b(1)(2)(3);
 
-        CHECK((    b == boost_hasher{}(1,2,3)    ));
+        CHECK((    b == boost_hasher{}(1,2,3)    )); // lvalues and rvalues compare equal
+
         CHECK((    boost_hasher{}(foo{},'a',3.0) == boost_hasher{}(foo{})('a')(3.0)    ));
         
         CHECK_FALSE((    boost_hasher{}(foo{},1,1) == boost_hasher{}(foo{})(1)(2)    ));           
@@ -113,14 +114,14 @@ TEST_CASE("boost_utilities","[boost_utilities]") {
         using v_two = boost::variant<boost::blank,int,double,float>;
         using v_merged = boost::variant<int,char,foo,boost::blank,double,float>;         
 
-        using tl_one = type_list<int,char,foo,boost::blank,int,double,float>; // not unique
-        using tl_two = type_list<int,char,foo,boost::blank,double,float>; // unique
+        using tlist_one = type_list<int,char,foo,boost::blank,int,double,float>; // not unique'd
+        using tlist_two = tlist_one::unique; // unique'd
 
-        using z_u_d = zip_mpl_sequences<v_one,v_two>::unique::discharge<boost::variant>;
+        using zipped_ = zip_mpl_sequences<v_one,v_two>::unique::discharge<boost::variant>;
 
         CHECK((    is_same<mpl_sequence_to_list<v_one>, type_list<int,char,foo>>{}    ));        
-        CHECK((    is_same<zip_mpl_sequences<v_one,v_two>, tl_one>{}    ));             
-        CHECK_FALSE((    is_same<zip_mpl_sequences<v_one,v_two>, tl_two>{}    ));        
-        CHECK((    is_same<z_u_d, v_merged>{}    ));
+        CHECK((    is_same<zip_mpl_sequences<v_one,v_two>, tlist_one>{}    ));             
+  CHECK_FALSE((    is_same<zip_mpl_sequences<v_one,v_two>, tlist_two>{}    ));        
+        CHECK((    is_same<zipped_, v_merged>{}    ));
     }
 }

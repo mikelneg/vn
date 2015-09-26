@@ -25,25 +25,23 @@
 namespace vn {
 
     template <typename ...Args>
-    struct type_list {
-                                // we use a compatibility_helper_xxx here because, for whatever reason, 
-        template <typename T>   // "typename detail::filter_<T,Args...>::template type<>;" causes an ICE in msvc..
-        using filter = typename detail::compatibility_helper_filter_<T,Args...>::type; 
-       
+    struct type_list {               
+                              
+        template <typename ...TArgs>   
+        using filter = typename detail::compatibility_helper_filter_list_<type_list<TArgs...>,type_list<Args...>>::type;
+        //using filter = typename detail::filter_list_<TArgs...>::template type<Args...>; // causes ICE in msvc 2015..
+
         template <typename ...TArgs>
         using join = type_list<Args...,TArgs...>;
     
-        using unique = typename detail::compatibility_helper_unique_<Args...>::type;
-    
+        using unique = typename detail::compatibility_helper_unique_<Args...>::type;    
+        
         template <typename ...TArgs>
         using merge = typename detail::merge_<type_list<Args...>,TArgs...>::type;
         
-        template <typename ...TArgs>
-        using join_flattened = typename detail::join_flattened_<TArgs...>::template type< type_list<Args...> >;
-
         template <template <typename...> typename TT>
         using discharge = TT<Args...>;
-
+        
         template <template <typename> typename PredicateTT>
         using each_satisfies = typename detail::apply_op_<PredicateTT,detail::conj>::template to<Args...>;   // == std::true_type or std::false_type
 

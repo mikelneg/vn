@@ -16,82 +16,125 @@ namespace vn {
     
     namespace detail {
 
-        template <typename T, typename ...Args>
-        struct filter_;
-        
-        template <typename T, typename H, typename ...Args>
-        struct filter_<T,H,Args...> {
-            template <typename ...TArgs>
-            using type = typename filter_<T,Args...>::template type<TArgs...,H>;
-        };
-        
-        template <typename T, typename ...Args>
-        struct filter_<T,T,Args...> {
-            template <typename ...TArgs>
-            using type = typename filter_<T,Args...>::template type<TArgs...>;
-        };
-        
-        template <typename T> 
-        struct filter_<T> {
-            template <typename ...TArgs>
-            using type = type_list<TArgs...>;    
-        };
-        
-        template <typename T>
-        struct unique_;
-        
-        template <typename T, typename ...Args>
-        struct unique_<type_list<T,Args...>> {
-            template <typename ...TArgs>
-            using type = typename unique_<typename type_list<Args...>::template filter<T>>::template type<TArgs...,T>;
-        };
-        
-        template <>
-        struct unique_<type_list<>> {
-            template <typename ...TArgs>
-            using type = type_list<TArgs...>;
-        };
-      
-        template <typename T, typename ...>
-        struct merge_;
-                
-        template <typename ...TArgs, typename ...RArgs>
-        struct merge_<type_list<TArgs...>, type_list<RArgs...>> {
-            using type = type_list<TArgs..., RArgs...>;
-        };
-
-        template <typename ...TArgs, typename ...RArgs, typename ...Args>
-        struct merge_<type_list<TArgs...>, type_list<RArgs...>, Args...> {
-            using type = typename merge_< type_list<TArgs..., RArgs...>, Args...>::type;
-        };
-
-        template <typename T>
-        struct flatten_ { 
-            template <template <typename...> typename TT> 
-            using type = TT<T>;
-        };
-
         template <typename ...Args>
-        struct flatten_<type_list<Args...>> {            
+        struct discharge_ {
             template <template <typename...> typename TT>
-            using type = TT<Args...>;
+            using into = TT<Args...>;
         };
-        
-        template <typename ...Args>
-        struct join_flattened_ {         
-            template <typename L>
-            using type = typename L::template merge< typename merge_<typename flatten_<Args>::template type<type_list>...>::type >;
-        };       
-        
-        template <typename ...Args>         // compatibility_helper's are needed to block ICEs in msvc
-        struct compatibility_helper_filter_ {
-            using type = typename filter_<Args...>::template type<>;
+
+        template <typename ...Args, template <typename...> typename XX>
+        struct discharge_<XX<Args...>> {
+            template <template <typename...> typename TT>
+            using into = TT<Args...>;
         };
+
+        inline namespace filter {
+            template <typename, typename ...Args> 
+            struct filter_;
+                    
+            template <typename F, typename H, typename ...Args> 
+            struct filter_<F,H,Args...> {   
+                template <typename ...TArgs>
+                using type = typename filter_<F,Args...>::template type<TArgs...,H>;
+            };
+            
+            template <typename F, typename ...Args>    
+            struct filter_<F,F,Args...> {
+                template <typename ...TArgs>
+                using type = typename filter_<F,Args...>::template type<TArgs...>;      
+            };
+            
+            template <typename T>    
+            struct filter_<T> {
+                template <typename ...TArgs>
+                using type = type_list<TArgs...>;    
+            };
+            
+            template <typename ...Args>    // compatibility_helper used to avoid ICE in msvc...
+            struct compatibility_helper_filter_ {
+                using type = typename filter_<Args...>::template type<>;
+            };
+            
+            template <typename ...Args> // generalizes filter_<> to work with none-or-many filter types
+            struct filter_list_;
+              
+            template <>
+            struct filter_list_<> {
+                template <typename... TArgs>
+                using type = type_list<TArgs...>;
+            };                    
+
+            template <typename T, typename ...Args> 
+            struct filter_list_<T,Args...> {
+                template <typename ...TArgs>
+                using type = typename discharge_<typename compatibility_helper_filter_<T,TArgs...>::type>::template into<typename filter_list_<Args...>::template type>;                            
+            };            
+            
+            template <typename F, typename L>    // compatibility_helper used to avoid ICE in msvc... 
+            struct compatibility_helper_filter_list_ {
+                using type = typename discharge_<L>::template into<typename discharge_<F>::template into<filter_list_>::template type>;
+            };
+
+        }
+
+        inline namespace unique {
+            template <typename T>
+            struct unique_;
+            
+            template <typename T, typename ...Args>
+            struct unique_<type_list<T,Args...>> {
+                template <typename ...TArgs>
+                using type = typename unique_<typename filter_list_<T>::template type<Args...>>::template type<TArgs...,T>;                
+            };        
+            
+            template <>
+            struct unique_<type_list<>> {
+                template <typename ...TArgs>
+                using type = type_list<TArgs...>;
+            };
+
+            template <typename ...Args>
+            struct compatibility_helper_unique_ {
+                using type = typename unique_<type_list<Args...>>::template type<>;
+            };
+        }
+
+        inline namespace merge {      
+            template <typename ...>
+            struct merge_lists_;
+
+            template <typename ...TArgs>
+            struct merge_lists_<type_list<TArgs...>> {
+                using type = type_list<TArgs...>;
+            };
+
+            template <typename ...TArgs, typename ...RArgs>
+            struct merge_lists_<type_list<TArgs...>, type_list<RArgs...>> {
+                using type = type_list<TArgs..., RArgs...>;
+            };
+
+            template <typename ...TArgs, typename ...RArgs, typename ...Args>
+            struct merge_lists_<type_list<TArgs...>, type_list<RArgs...>, Args...> {
+                using type = typename merge_lists_< type_list<TArgs..., RArgs...>, Args...>::type;
+            };
         
-        template <typename ...Args>
-        struct compatibility_helper_unique_ {
-            using type = typename unique_<type_list<Args...>>::template type<>;
-        };
+            //template <typename T>
+            //struct flatten_if_list_ { 
+            //    template <template <typename...> typename TT> 
+            //    using into = TT<T>;
+            //};
+            //
+            //template <typename ...Args>
+            //struct flatten_if_list_<type_list<Args...>> {            
+            //    template <template <typename...> typename TT>
+            //    using into = TT<Args...>;
+            //};
+            
+            template <typename ...Args>
+            struct merge_ {                         
+                using type = typename merge_lists_<typename discharge_<Args>::template into<type_list>... >::type;
+            };                      
+        }
 
         // apply tools 
         template <template <typename> typename TT, typename PairwiseOp, typename ...Args>
