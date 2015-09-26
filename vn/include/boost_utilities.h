@@ -54,6 +54,10 @@ namespace vn {
     struct lambda_visitor : Args..., boost::static_visitor<R> {
         template <typename ...CArgs>
         lambda_visitor(CArgs&&... cargs) : Args(std::forward<CArgs>(cargs))... {}
+
+        lambda_visitor(lambda_visitor&&) = default;
+        lambda_visitor(lambda_visitor const&) = default;
+        lambda_visitor& operator=(lambda_visitor const&) = delete;
     };
 
     template <typename R = void, typename ...Fs>
