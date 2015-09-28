@@ -6,13 +6,26 @@
 
     namespace vn
 
-    Utilities for Boost libraries
+    Some utilities for Boost libraries:
     
-    - make_variant_vector(Args...) 
-        * moves/copies args into std::vector<boost::variant<Args...>> (with unique Args)
-        * requires copy-initializable types 
+    - make_variant_vector(FwdArgs&&...)/make_variant_vector_with_allocator(Allocator&&,FwdArgs&&...)
+        - forwards args into std::vector<boost::variant<Args...>> (with unique Args)
+        - requires copy-initializable types 
 
-    - make_lambda_visitor<ReturnType>(Funcs&&...)
+    - make_lambda_visitor<ReturnType>(Funcs&&...) (to be used with boost::apply_visitor)
+
+    - boost_hasher (a vn::hasher<> variation that uses boost::hash_combine)
+
+    - extended_variant<...> template, accepts boost::variant<...> types and generates an 
+      "extended" variant type that includes each sub-type
+
+    - variant_over<...> template, accepts any set of types and generates a boost::variant<...>
+      over them; additionally "flattens" any boost::variant<...> types 
+      (e.g., variant_over<int,char,boost::variant<float,double>> == boost::variant<int,char,float,double>)
+
+    - mpl_sequence_to_list<...> converts a boost mpl sequence to a vn::type_list<...>
+    
+    - zip_mpl_sequences<...> "zips" a sequence of mpl sequences into a vn::type_list<...> 
 
 -----------------------------------------------------------------------------*/
 #include <cstddef>
