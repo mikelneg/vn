@@ -4,7 +4,7 @@
 /*-----------------------------------------------------------------------------
     Mikel Negugogor (http://github.com/mikelneg)
 
-    Implementation details for type_list -- shouldn't be used directly..    
+    Implementation details for vn::type_list -- shouldn't be used directly..    
 -----------------------------------------------------------------------------*/
 
 #include <type_traits> // for std::true_type/std::false_type
@@ -117,84 +117,72 @@ namespace vn {
             struct merge_lists_<type_list<TArgs...>, type_list<RArgs...>, Args...> {
                 using type = typename merge_lists_< type_list<TArgs..., RArgs...>, Args...>::type;
             };
-        
-            //template <typename T>
-            //struct flatten_if_list_ { 
-            //    template <template <typename...> typename TT> 
-            //    using into = TT<T>;
-            //};
-            //
-            //template <typename ...Args>
-            //struct flatten_if_list_<type_list<Args...>> {            
-            //    template <template <typename...> typename TT>
-            //    using into = TT<Args...>;
-            //};
-            
+                   
             template <typename ...Args>
             struct merge_ {                         
                 using type = typename merge_lists_<typename discharge_<Args>::template into<type_list>... >::type;
             };                      
         }
 
-        // apply tools 
-        template <template <typename> typename TT, typename PairwiseOp, typename ...Args>
-        struct apply_;
-        
-        template <template <typename> typename TT, typename PairwiseOp, typename T, typename H, typename P, typename ...Args>
-        struct apply_<TT,PairwiseOp,T,H,P,Args...> {
-            using result = decltype(PairwiseOp{}( TT<T>{}, typename apply_<TT,PairwiseOp,H,P,Args...>::result{} ));
-        };
-        
-        template <template <typename> typename TT, typename PairwiseOp, typename T, typename H>
-        struct apply_<TT,PairwiseOp,T,H> {
-            using result = decltype(PairwiseOp{}( TT<T>{}, TT<H>{} ));
-        };
-        
-        template <template <typename> typename TT, typename PairwiseOp, typename T>
-        struct apply_<TT,PairwiseOp,T> {
-            using result = TT<T>;
-        };
-        
-        template <typename Pred, typename ONE = std::true_type, typename ZERO = std::false_type>
-        struct bool_op {
-            template <typename T, typename R>
-            std::enable_if_t<(Pred{}(T{},R{})), ONE> operator()(T,R) const;
-        
-            template <typename T, typename R>
-            std::enable_if_t<!(Pred{}(T{},R{})), ZERO> operator()(T,R) const;
-        };
-        
-        struct both {
-            template <typename T, typename R>
-            constexpr bool operator()(T,R) const { return T::value && R::value; }
-        };
-        
-        struct either {
-            template <typename T, typename R>
-            constexpr bool operator()(T,R) const { return T::value || R::value; }
-        };
-                
-        struct if_then {
-            template <typename T, typename R>
-            constexpr bool operator()(T,R) const { return !T::value || R::value; }
-        };
-        
-        struct only_one {
-            template <typename T, typename R>
-            constexpr bool operator()(T,R) const { return !(T::value && R::value) && (T::value || R::value); }
-        };
-                
-        using conj = bool_op<both>;
-        using disj = bool_op<either>;
-        using impl = bool_op<if_then>;
-        using xor_ = bool_op<only_one>;
-        
-        template <template <typename> typename TT, typename PairwiseOp>
-        struct apply_op_ {
-            template <typename ...Args>
-            using to = typename apply_<TT,PairwiseOp,Args...>::result;
-        };
-
+        inline namespace apply_op {            
+            template <template <typename> typename TT, typename PairwiseOp, typename ...Args>
+            struct apply_;
+            
+            template <template <typename> typename TT, typename PairwiseOp, typename T, typename H, typename P, typename ...Args>
+            struct apply_<TT,PairwiseOp,T,H,P,Args...> {
+                using result = decltype(PairwiseOp{}( TT<T>{}, typename apply_<TT,PairwiseOp,H,P,Args...>::result{} ));
+            };
+            
+            template <template <typename> typename TT, typename PairwiseOp, typename T, typename H>
+            struct apply_<TT,PairwiseOp,T,H> {
+                using result = decltype(PairwiseOp{}( TT<T>{}, TT<H>{} ));
+            };
+            
+            template <template <typename> typename TT, typename PairwiseOp, typename T>
+            struct apply_<TT,PairwiseOp,T> {
+                using result = TT<T>;
+            };
+            
+            template <typename Pred, typename ONE = std::true_type, typename ZERO = std::false_type>
+            struct bool_op {
+                template <typename T, typename R>
+                std::enable_if_t<(Pred{}(T{},R{})), ONE> operator()(T,R) const;
+            
+                template <typename T, typename R>
+                std::enable_if_t<!(Pred{}(T{},R{})), ZERO> operator()(T,R) const;
+            };
+            
+            struct both {
+                template <typename T, typename R>
+                constexpr bool operator()(T,R) const { return T::value && R::value; }
+            };
+            
+            struct either {
+                template <typename T, typename R>
+                constexpr bool operator()(T,R) const { return T::value || R::value; }
+            };
+                    
+            struct if_then {
+                template <typename T, typename R>
+                constexpr bool operator()(T,R) const { return !T::value || R::value; }
+            };
+            
+            struct only_one {
+                template <typename T, typename R>
+                constexpr bool operator()(T,R) const { return !(T::value && R::value) && (T::value || R::value); }
+            };
+                    
+            using conj = bool_op<both>;
+            using disj = bool_op<either>;
+            using impl = bool_op<if_then>;
+            using xor_ = bool_op<only_one>;
+            
+            template <template <typename> typename TT, typename PairwiseOp>
+            struct apply_op_ {
+                template <typename ...Args>
+                using to = typename apply_<TT,PairwiseOp,Args...>::result;
+            };
+        }
     } // namespace detail
 } // namespace vn
 #endif

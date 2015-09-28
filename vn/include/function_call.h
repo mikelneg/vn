@@ -34,7 +34,7 @@ namespace vn {
     class function_call<F,HashType> : private F {
         std::size_t parameter_hash;        
     public:        
-        constexpr function_call(F&& f, std::size_t parameter_hash) noexcept    
+        function_call(F&& f, std::size_t parameter_hash) noexcept(noexcept(F{std::move(f)}))
         :   F{std::move(f)},
             parameter_hash{parameter_hash}
             {}
@@ -51,8 +51,12 @@ namespace vn {
         constexpr bool calls_same_function_as(function_call<Args...> const&) const noexcept { return false; }
         constexpr bool calls_same_function_as(function_call const&) const noexcept { return true; }
         
+        template <typename ...Args>
+        constexpr bool operator==(function_call<Args...> const&) const noexcept { return false; }
         constexpr bool operator==(function_call const& other) const noexcept { return parameter_hash == other.parameter_hash; }
-        constexpr bool operator!=(function_call const& other) const noexcept { return !(*this == other); }
+        
+        template <typename ...Args>
+        constexpr bool operator!=(function_call<Args...> const& other) const noexcept { return !(*this == other); }        
     }; 
 
     template <typename R, typename ...Args, typename F, typename HashType>
@@ -62,7 +66,7 @@ namespace vn {
         std::size_t parameter_hash;
         func_ptr_t func_ptr;
     public:        
-        constexpr function_call(F&& f, func_ptr_t func_ptr, std::size_t parameter_hash) noexcept    
+        function_call(F&& f, func_ptr_t func_ptr, std::size_t parameter_hash) noexcept(noexcept(F{std::move(f)}))
         :   F{std::move(f)},
             parameter_hash{parameter_hash},
             func_ptr{func_ptr} {}
@@ -75,13 +79,16 @@ namespace vn {
         
         using F::operator();
     
-        template <typename Args...>
+        template <typename ...Args>
         constexpr bool calls_same_function_as(function_call<Args...> const&) const noexcept { return false; }
         constexpr bool calls_same_function_as(function_call const& other) const noexcept { return other.func_ptr == func_ptr; }
 
+        template <typename ...Args>
+        constexpr bool operator==(function_call<Args...> const&) const noexcept { return false; }
         constexpr bool operator==(function_call const& other) const noexcept { return func_ptr == other.func_ptr && 
                                                                                       parameter_hash == other.parameter_hash; }        
-        constexpr bool operator!=(function_call const& other) const noexcept { return !(*this == other); }
+        template <typename ...Args>
+        constexpr bool operator!=(function_call<Args...> const& other) const noexcept { return !(*this == other); }        
     }; 
 
     template <typename R, typename C, typename ...Args, typename F, typename HashType>
@@ -92,7 +99,7 @@ namespace vn {
         func_ptr_t func_ptr;
 
     public:        
-        constexpr function_call(F&& f, func_ptr_t func_ptr, std::size_t parameter_hash) noexcept    
+        constexpr function_call(F&& f, func_ptr_t func_ptr, std::size_t parameter_hash) noexcept(noexcept(F{std::move(f)}))    
         :   F{std::move(f)},
             parameter_hash{parameter_hash},
             func_ptr{func_ptr} {}
@@ -105,17 +112,20 @@ namespace vn {
         
         using F::operator();
     
-        template <typename Args...>
+        template <typename ...Args>
         constexpr bool calls_same_function_as(function_call<Args...> const&) const noexcept { return false; }
         constexpr bool calls_same_function_as(function_call const& other) const noexcept { return other.func_ptr == func_ptr; }
 
+        template <typename ...Args>
+        constexpr bool operator==(function_call<Args...> const&) const noexcept { return false; }
         constexpr bool operator==(function_call const& other) const noexcept { return func_ptr == other.func_ptr && 
                                                                                       parameter_hash == other.parameter_hash; } 
-        constexpr bool operator!=(function_call const& other) const noexcept { return !(*this == other); }
+        template <typename ...Args>
+        constexpr bool operator!=(function_call<Args...> const& other) const noexcept { return !(*this == other); }        
     };    
 
     template <typename ...Args, typename ...BArgs>
-    constexpr bool same_function_call(function_call<Args...> const& lhs, function_call<BArgs...> const& rhs) noexcept(noexcept(lhs.calls_same_function_as(rhs))) { 
+    constexpr bool calls_same_function(function_call<Args...> const& lhs, function_call<BArgs...> const& rhs) noexcept(noexcept(lhs.calls_same_function_as(rhs))) { 
         return lhs.calls_same_function_as(rhs); 
     }
     
