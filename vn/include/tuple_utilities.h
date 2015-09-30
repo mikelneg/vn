@@ -35,7 +35,7 @@ namespace vn {
         template <typename ...Args, std::size_t ...Ns, typename F>
         void call_for_each_element_helper_(std::tuple<Args...> const& tuple_, std::index_sequence<Ns...>, F&& func) 
         {
-            int discard[]{0,(func(std::get<Ns>(tuple_)),0)... };
+            int discard[]{0,(std::forward<F>(func)(std::get<Ns>(tuple_)),0)... };
             (void)discard;
         }
     } 

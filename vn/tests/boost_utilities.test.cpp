@@ -25,6 +25,7 @@ TEST_CASE("boost_utilities","[boost_utilities]") {
     using vn::boost_hasher;
     using vn::mpl_sequence_to_list;
     using vn::zip_mpl_sequences;
+    using vn::variant_contains;
 
     // functions we test
     using vn::make_variant_vector;
@@ -36,7 +37,9 @@ TEST_CASE("boost_utilities","[boost_utilities]") {
         CHECK((    is_same<extended_variant<v_one,v_two>, v_merged>{}     ));        
         CHECK((    is_same<variant_over<v_one,v_two>, v_merged>{}         ));        
         CHECK((    is_same<variant_over<int,char,foo,v_two>, v_merged>{}  ));
-        CHECK((    is_same<variant_over<int,char,foo>, v_one>{}           ));            
+        CHECK((    is_same<variant_over<int,char,foo>, v_one>{}           ));
+        CHECK((    variant_contains<v_one,int>{}                          ));
+  CHECK_FALSE((    variant_contains<v_one,float>{}                        ));
     }
 
     SECTION("vn::boost_hasher tests") 

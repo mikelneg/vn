@@ -24,24 +24,25 @@ namespace vn {
         template <typename T>   // used to postpone the triggering of static_asserts
         constexpr bool false_() noexcept { return false; }
         
-        template <std::size_t N>
-        struct index_ { constexpr static std::size_t value = N; 
-                        constexpr operator std::size_t() const noexcept { return value; } };
+        template <int N>
+        struct index_ { constexpr static int value = N; 
+                        constexpr operator int() const noexcept { return value; } };
         
         template <typename T, typename ...>
-        struct index_of_helper_ {
-            static_assert(false_<T>(), "static_assert triggered: T not found in Args in index_of<T,Args...>");
+        struct index_of_helper_ {   // chosen if T is not in Args...            
+            template <int>
+            using type = index_<-1>;
         };
             
         template <typename T, typename ...Targs>
         struct index_of_helper_<T,T,Targs...> {
-            template <std::size_t N>
+            template <int N>
             using type = index_<N>;
         };
         
         template <typename T, typename H, typename ...Targs>
         struct index_of_helper_<T,H,Targs...> {
-            template <std::size_t N>
+            template <int N>
             using type = typename index_of_helper_<T,Targs...>::template type<N+1>;
         };        
              
@@ -71,22 +72,28 @@ namespace vn {
 
     template <typename T, typename ...TArgs>
     struct index_of {    
-        constexpr static std::size_t value = detail::index_of_helper_<T,TArgs...>::template type<0>::value;
-        constexpr operator std::size_t() const noexcept { return value; }
+        constexpr static int value = detail::index_of_helper_<T,TArgs...>::template type<0>::value;
+        constexpr operator int() const noexcept { return value; }
     };
     
     template <typename T, template <typename...> typename TT, typename ...TArgs>
     struct index_of<T, TT<TArgs...>> {    
-        constexpr static std::size_t value = detail::index_of_helper_<T,TArgs...>::template type<0>::value;    
-        constexpr operator std::size_t() const noexcept { return value; }
+        constexpr static int value = detail::index_of_helper_<T,TArgs...>::template type<0>::value;    
+        constexpr operator int() const noexcept { return value; }
     };    
 
     template <template <typename...> typename TT, typename ...TArgs> // catches cases where TT<TArgs...> appears as first and second param,                                                                      
     struct index_of<TT<TArgs...>, TT<TArgs...>> {                    // in which case we do not dig into TArgs...
-        constexpr static std::size_t value = 0;    
-        constexpr operator std::size_t() const noexcept { return value; }
+        constexpr static int value = 0;    
+        constexpr operator int() const noexcept { return value; }
     };
     
+    template <typename C, typename T>
+    struct contains {
+        constexpr static const bool value = (index_of<T,C>::value > -1);
+        constexpr operator bool() const noexcept { return value; }
+    };
+  
     template <typename T>
     using remove_rvalue_reference = typename detail::conditional_remap_<std::is_rvalue_reference,std::remove_reference>::template applied_to<T>;
     

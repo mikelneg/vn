@@ -8,9 +8,10 @@
 
     Some utilities for Boost libraries:
     
-    - make_variant_vector(FwdArgs&&...)/make_variant_vector_with_allocator(Allocator&&,FwdArgs&&...)
-        - forwards args into std::vector<boost::variant<Args...>> (with unique Args)
-        - requires copy-initializable types 
+    - std::vector<...> make_variant_vector<AdditionalTypes>(Args&&...args)
+    - std::vector<...,Allocator> make_variant_vector_with_allocator(Allocator&&,Args&&...args)
+        - forwards args into a std::vector<boost::variant<AdditionalTypes...,Args...>> (with unique AdditionalTypes+Args)
+          and returns it        
 
     - make_lambda_visitor<ReturnType>(Funcs&&...) (to be used with boost::apply_visitor)
 
@@ -42,11 +43,10 @@
 #include <boost/functional/hash.hpp>
 #include <boost/mpl/begin_end.hpp>
 
-namespace vn {    
+namespace vn {        
     template <typename ...AdditionalTypes, typename ...Args>
-    auto make_variant_vector(Args&&...args) {
-        using ret_var = typename type_list<std::remove_reference_t<AdditionalTypes>..., 
-                                           std::remove_reference_t<Args>...>::unique::template discharge<boost::variant>;
+    auto make_variant_vector(Args&&...args) {        
+        using ret_var = typename type_list<std::remove_reference_t<AdditionalTypes>...,std::remove_reference_t<Args>...>::unique::template discharge<boost::variant>;
         std::vector<ret_var> v;
         v.reserve(sizeof...(Args));        
         int discard[]{0,(v.emplace_back(std::forward<Args>(args)),0)...};
@@ -54,9 +54,8 @@ namespace vn {
     }
 
     template <typename ...AdditionalTypes, typename Allocator, typename ...Args>
-    auto make_variant_vector_with_allocator(Allocator&& allocator, Args&&...args) {
-        using ret_var = typename type_list<std::remove_reference_t<AdditionalTypes>..., 
-                                           std::remove_reference_t<Args>...>::unique::template discharge<boost::variant>;
+    auto make_variant_vector_with_allocator(Allocator&& allocator, Args&&...args) {        
+        using ret_var = typename type_list<std::remove_reference_t<AdditionalTypes>...,std::remove_reference_t<Args>...>::unique::template discharge<boost::variant>;
         std::vector<ret_var, typename Allocator::template rebind<ret_var>::other> v;
         v.reserve(sizeof...(Args));        
         int discard[]{0,(v.emplace_back(std::forward<Args>(args)),0)...};
@@ -85,7 +84,10 @@ namespace vn {
         };                                                                                
     }
 
-    using boost_hasher = vn::hasher<detail::boost_hash_combine_functor>;
+    // using boost_hasher = vn::hasher<detail::boost_hash_combine_functor>; // previously used a typedef.
+    struct boost_hasher : vn::hasher<detail::boost_hash_combine_functor> {  // the typedef was generating many annoying "decorated name length exceeded" warnings.. 
+        using vn::hasher<detail::boost_hash_combine_functor>::hasher;       // now we just inherit from it and use its ctors.
+    };
 
     namespace detail {
         template <typename It, typename E>
@@ -138,9 +140,12 @@ namespace vn {
         struct variant_over_ { 
             using type = typename vn::type_list<>::template merge< typename list_from_T_or_variant_<Args>::type ... >::unique::template discharge<boost::variant>;                            
         };
-    } 
+    }     
 
-    template <typename ...Args>
+    template <typename VarType, typename T>
+    using variant_contains = vn::contains<mpl_sequence_to_list<VarType>,T>;
+
+    template <typename ...Args> // might be redundant given variant_over<>...
     using extended_variant = typename detail::common_variant_<Args...>::type; // Args must be boost::variant<...> types
 
     template <typename ...Args>

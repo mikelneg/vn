@@ -57,6 +57,8 @@ namespace vn {
         
         template <typename ...Args>
         constexpr bool operator!=(function_call<Args...> const& other) const noexcept { return !(*this == other); }        
+        
+        template <typename...> friend class function_call;
     }; 
 
     template <typename R, typename ...Args, typename F, typename HashType>
@@ -81,14 +83,18 @@ namespace vn {
     
         template <typename ...Args>
         constexpr bool calls_same_function_as(function_call<Args...> const&) const noexcept { return false; }
-        constexpr bool calls_same_function_as(function_call const& other) const noexcept { return other.func_ptr == func_ptr; }
+        
+        template <typename XX, typename YY>
+        constexpr bool calls_same_function_as(function_call<R(*)(Args...),XX,YY> const& other) const noexcept { return other.func_ptr == func_ptr; }        
 
         template <typename ...Args>
         constexpr bool operator==(function_call<Args...> const&) const noexcept { return false; }
         constexpr bool operator==(function_call const& other) const noexcept { return func_ptr == other.func_ptr && 
                                                                                       parameter_hash == other.parameter_hash; }        
         template <typename ...Args>
-        constexpr bool operator!=(function_call<Args...> const& other) const noexcept { return !(*this == other); }        
+        constexpr bool operator!=(function_call<Args...> const& other) const noexcept { return !(*this).operator==(other); }      
+
+        template <typename...> friend class function_call;
     }; 
 
     template <typename R, typename C, typename ...Args, typename F, typename HashType>
@@ -114,14 +120,18 @@ namespace vn {
     
         template <typename ...Args>
         constexpr bool calls_same_function_as(function_call<Args...> const&) const noexcept { return false; }
-        constexpr bool calls_same_function_as(function_call const& other) const noexcept { return other.func_ptr == func_ptr; }
+        
+        template <typename XX, typename YY>
+        constexpr bool calls_same_function_as(function_call<R(C::*)(Args...),XX,YY> const& other) const noexcept { return other.func_ptr == func_ptr; }
 
         template <typename ...Args>
         constexpr bool operator==(function_call<Args...> const&) const noexcept { return false; }
         constexpr bool operator==(function_call const& other) const noexcept { return func_ptr == other.func_ptr && 
                                                                                       parameter_hash == other.parameter_hash; } 
         template <typename ...Args>
-        constexpr bool operator!=(function_call<Args...> const& other) const noexcept { return !(*this == other); }        
+        constexpr bool operator!=(function_call<Args...> const& other) const noexcept { return !(*this).operator==(other); }
+
+        template <typename...> friend class function_call;
     };    
 
     template <typename ...Args, typename ...BArgs>
