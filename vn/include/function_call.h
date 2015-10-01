@@ -5,16 +5,14 @@
     Mikel Negugogor (http://github.com/mikelneg)                              
 
     namespace vn
-        
-    types: 
-        class function_call<Callable,Hasher>;
+         
+    class function_call<...>;      
+    function_call<...> make_function_call(...); 
 
-    functions:
-        function_call<Callable,Hasher = vn::boost_hasher> make_function_call<Hasher>(Callable,Args...); 
-
-    - Wraps a std::bind(...) object and a hash of the parameters    
-    - Hashing checks std::is_placeholder<T> for placeholder types and uses their value 
-      as their hash value
+    - function_call<...> wraps a std::bind(...) object and stores a hash of 
+      the parameters
+    - Uses default hasher vn::boost_hasher, which works with placeholder types
+      and reference_wrapper<>
 -----------------------------------------------------------------------------*/
 
 #include "boost_utilities.h"
@@ -26,7 +24,7 @@
 #include <utility>    
 
 namespace vn {      
-
+    
     template <typename ...>
     class function_call;
     
@@ -78,7 +76,7 @@ namespace vn {
 
         function_call& operator=(function_call&&) = default;
         function_call& operator=(function_call const&) = default;
-        
+        paul    
         using F::operator();
     
         template <typename ...Args>
