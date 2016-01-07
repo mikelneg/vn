@@ -57,6 +57,11 @@ namespace vn {
             template <typename Q>
             using applied_to = std::conditional_t<Pred<Q>::value, typename Map<Q>::type, Q>; 
         };                
+
+        template <typename T, typename>
+        struct first_of_helper_ {
+            using type = T;
+        };
     }    
 
     template <typename T>
@@ -100,6 +105,9 @@ namespace vn {
     template <typename T>
     using identity = typename detail::identity_<T>::type;
 
+    template <typename T, typename Q>
+    using first_of = typename detail::first_of_helper_<T,Q>::type;
+    
     //template <typename R, typename C, typename ...Args>
     //R return_type(R(C::*)(Args...));      
     //    

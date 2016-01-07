@@ -76,7 +76,7 @@ namespace vn {
 
         function_call& operator=(function_call&&) = default;
         function_call& operator=(function_call const&) = default;
-        paul    
+        
         using F::operator();
     
         template <typename ...Args>
