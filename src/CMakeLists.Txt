@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.0)
+
+project(VN)
+
+file(GLOB VN_SRC
+    "*.cpp"
+)
+
+add_library(vn ${VN_SRC})
+install(TARGETS vn DESTINATION LIBRARY_OUTPUT_DIRECTORY)

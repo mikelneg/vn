@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.0)
+
+project(VN)
+
+set(LIBRARY_OUTPUT_PATH ${VN_SOURCE_DIR}/lib)
+
+include_directories(${VN_SOURCE_DIR}/include)
+include_directories(${BOOST_DIR})
+
+add_subdirectory(src)
+
+

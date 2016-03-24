@@ -11,12 +11,14 @@
 
 #include <cstddef>
 //#include <type_traits>
-#include <vn/include/has_equality_operator.h>
+#include <vn/has_equality_operator.h>
 #include <boost/variant.hpp>
 
 namespace vn {        
 namespace visitors {
     
+    template <typename T>
+    struct has_variant_type;     
     struct same_type;
     struct weak_equality; // if same type and operator== comparable, returns operator== result
                           // if same type but not operator== comparable, returns true 
@@ -24,6 +26,13 @@ namespace visitors {
 
  // struct strict_equality; // as above, but if same type but not operator== comparable, returns false
                     
+    template <typename T>
+    struct has_variant_type : boost::static_visitor<bool> {
+        template <typename Q>
+        constexpr bool operator()(Q const&) const { return false; }
+        constexpr bool operator()(T const&) const { return true; }
+    };
+
     struct same_type : boost::static_visitor<bool> {
         template <typename T, typename Q>
         constexpr bool operator()(T const&, Q const&) const { return false; }
