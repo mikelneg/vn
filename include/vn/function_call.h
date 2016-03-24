@@ -15,9 +15,9 @@
       and reference_wrapper<>
 -----------------------------------------------------------------------------*/
 
-#include "boost_utilities.h"
-#include "utilities.h"  
-#include "hasher.h"
+#include <vn/boost_utilities.h>
+#include <vn/utilities.h>
+#include <vn/hasher.h>
 
 #include <functional> 
 #include <type_traits>

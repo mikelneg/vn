@@ -22,7 +22,7 @@
       type_list<int,float>::any_satisfies<std::is_placeholder> == std::false_type
 
 -----------------------------------------------------------------------------*/
-#include "type_list_detail.h"
+#include <vn/detail/type_list_detail.h>
 #include <type_traits>
 
 namespace vn {

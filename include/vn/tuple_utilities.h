@@ -10,7 +10,7 @@
 
 -----------------------------------------------------------------------------*/
 #include <cstddef>
-#include "utilities.h"
+#include <vn/utilities.h>
 #include <tuple>
 #include <type_traits>
 #include <utility>

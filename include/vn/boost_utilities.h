@@ -31,9 +31,9 @@
 -----------------------------------------------------------------------------*/
 #include <cstddef>
 
-#include "type_list.h"
-#include "utilities.h"
-#include "hasher.h"
+#include <vn/type_list.h>
+#include <vn/utilities.h>
+#include <vn/hasher.h>
 
 #include <type_traits>
 #include <utility>
