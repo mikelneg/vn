@@ -15,7 +15,7 @@
       and reference_wrapper<>
 -----------------------------------------------------------------------------*/
 
-#include <vn/boost_utilities.h>
+#include <vn/boost_variant_utilities.h>
 #include <vn/utilities.h>
 #include <vn/hasher.h>
 

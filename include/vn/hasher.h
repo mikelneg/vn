@@ -41,6 +41,7 @@ namespace vn {
         hasher& operator()(Args const&... args) {                                                    
             using C = CombineFunctor;            
             int discard[]{0,((C{}.*static_cast<void(C::*)(std::size_t&,decltype(args))const>(&C::operator()))(seed, args),0)...};                                                
+            (void)discard;
             return *this;       // ugly static_cast of &C::operator() to guarantee that it has the right signature                          
         }
                 

@@ -50,6 +50,7 @@ namespace vn {
         std::vector<ret_var> v;
         v.reserve(sizeof...(Args));        
         int discard[]{0,(v.emplace_back(std::forward<Args>(args)),0)...};
+        (void)discard;
         return v;
     }
 
@@ -59,6 +60,7 @@ namespace vn {
         std::vector<ret_var, typename Allocator::template rebind<ret_var>::other> v;
         v.reserve(sizeof...(Args));        
         int discard[]{0,(v.emplace_back(std::forward<Args>(args)),0)...};
+        (void)discard;
         return v;
     }
       
