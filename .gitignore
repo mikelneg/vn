@@ -9,7 +9,9 @@
 !README.md
 !LICENSE
 !.gitignore
+!*.c
 !*.cpp
 !*.h
 !*.hpp
 !*.hlsl
+!*.xml

@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include <vn/include/boost_utilities.h>
-#include <vn/include/type_list.h>
+#include <vn/boost_variant_utilities.h>
+#include <vn/type_list.h>
 
 #include <cstddef>
 #include <type_traits>
@@ -9,7 +9,7 @@
 
 struct foo { friend std::size_t hash_value(foo const&) { return 55; } };
 
-TEST_CASE("boost_utilities","[boost_utilities]") {                    
+TEST_CASE("boost_variant_utilities","[boost_variant_utilities]") {                    
     // types we use in the test
     using std::is_same;
     using std::tuple;

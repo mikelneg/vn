@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(VN)
-
-file(GLOB VN_SRC
-    "*.cpp"
+set(VN_SRC 
+	math_utilities.cpp
 )
 
 add_library(vn ${VN_SRC})
+
+target_include_directories(vn BEFORE PUBLIC "${VN_SOURCE_DIR}/include/")
+
 install(TARGETS vn DESTINATION LIBRARY_OUTPUT_DIRECTORY)

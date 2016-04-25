@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include <vn/include/utilities.h>
+#include <vn/utilities.h>
 
 #include <type_traits>
 #include <tuple>
