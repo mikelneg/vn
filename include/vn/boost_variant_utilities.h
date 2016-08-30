@@ -43,7 +43,10 @@
 #include <boost/functional/hash.hpp>
 #include <boost/mpl/begin_end.hpp>
 
+#include <vn/composite_function.h>
+
 namespace vn {        
+
     template <typename ...AdditionalTypes, typename ...Args>
     auto make_variant_vector(Args&&...args) {        
         using ret_var = typename type_list<std::remove_reference_t<AdditionalTypes>...,std::remove_reference_t<Args>...>::unique::template discharge<boost::variant>;
@@ -53,32 +56,40 @@ namespace vn {
         (void)discard;
         return v;
     }
-
-    template <typename ...AdditionalTypes, typename Allocator, typename ...Args>
-    auto make_variant_vector_with_allocator(Allocator&& allocator, Args&&...args) {        
-        using ret_var = typename type_list<std::remove_reference_t<AdditionalTypes>...,std::remove_reference_t<Args>...>::unique::template discharge<boost::variant>;
-        std::vector<ret_var, typename Allocator::template rebind<ret_var>::other> v;
-        v.reserve(sizeof...(Args));        
-        int discard[]{0,(v.emplace_back(std::forward<Args>(args)),0)...};
-        (void)discard;
-        return v;
-    }
-      
-    template <typename R, typename ...Args>
-    struct lambda_visitor : Args..., boost::static_visitor<R> {
-        template <typename ...CArgs>
-        lambda_visitor(CArgs&&... cargs) : Args(std::forward<CArgs>(cargs))... {}
-
-        lambda_visitor(lambda_visitor&&) = default;
-        lambda_visitor(lambda_visitor const&) = default;
-        lambda_visitor& operator=(lambda_visitor const&) = delete;
-    };
-
-    template <typename R = void, typename ...Fs>
-    auto make_lambda_visitor(Fs&&... fs) {         
-        return lambda_visitor<R, typename std::remove_reference<Fs>::type...>{std::forward<Fs>(fs)...};
-    }    
     
+    // // lambda_visitor and company replaced with composite_function 
+    //
+    //template <typename ...AdditionalTypes, typename Allocator, typename ...Args>
+    //auto make_variant_vector_with_allocator(Allocator&& allocator, Args&&...args) {        
+    //    using ret_var = typename type_list<std::remove_reference_t<AdditionalTypes>...,std::remove_reference_t<Args>...>::unique::template discharge<boost::variant>;
+    //    std::vector<ret_var, typename Allocator::template rebind<ret_var>::other> v;
+    //    v.reserve(sizeof...(Args));        
+    //    int discard[]{0,(v.emplace_back(std::forward<Args>(args)),0)...};
+    //    (void)discard;
+    //    return v;
+    //}
+    //  
+    //template <typename R, typename ...Args>
+    //struct lambda_visitor : Args..., boost::static_visitor<R> {
+    //    template <typename ...CArgs>
+    //    lambda_visitor(CArgs&&... cargs) : Args(std::forward<CArgs>(cargs))... {}
+    //
+    //    lambda_visitor(lambda_visitor&&) = default;
+    //    lambda_visitor(lambda_visitor const&) = default;
+    //    lambda_visitor& operator=(lambda_visitor const&) = delete;
+    //};
+    //
+    //template <typename R = void, typename ...Fs>
+    //auto make_lambda_visitor(Fs&&... fs) {         
+    //    return lambda_visitor<R, typename std::remove_reference<Fs>::type...>{std::forward<Fs>(fs)...};
+    //}        
+    //
+    template <typename...Fs>
+    constexpr auto make_lambda_visitor(Fs&&...fs) {
+        return vn::make_composite_function(std::forward<Fs>(fs)...); 
+    }
+    //
+
     namespace detail {
         struct boost_hash_combine_functor {
             template <typename T>

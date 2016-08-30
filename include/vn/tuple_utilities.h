@@ -25,7 +25,8 @@ namespace vn {
     std::tuple<Args...> 
     tuple_type_from_parameters(R(C::*)(Args...) const); // no implementation         
    
-    namespace detail {
+    namespace detail { 
+
         template <typename ...Args, std::size_t ...Ns, typename F>
         decltype(auto) call_with_all_elements_helper_(std::tuple<Args...> const& tuple_, std::index_sequence<Ns...>, F&& func)
         {
