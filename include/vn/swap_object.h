@@ -9,63 +9,66 @@
 
 -----------------------------------------------------------------------------*/
 
-#include <memory>
 #include <atomic>
+#include <memory>
 
 namespace vn {
 
-    template <typename T>
-    class swap_object {                
-        
-        enum class status { stale,
-                            fresh, 
-                            busy };
+template <typename T>
+class swap_object {
 
-        std::atomic<status> status_flag_;        
-        
-        T local_object_;  
+    enum class status { stale,
+        fresh,
+        busy };
 
-    public:
+    std::atomic<status> status_flag_;
 
-        swap_object()
-            : status_flag_{status::stale}
-        {}
-                
-        swap_object(T t)
-            :   local_object_(std::move(t)),            
-                status_flag_{status::fresh}
-        {}
+    T local_object_;
 
-        swap_object(swap_object const&) = delete;
-        swap_object& operator=(swap_object const&) = delete;        
+public:
+    swap_object()
+        : status_flag_{ status::stale }
+    {
+    }
 
-        void swap_in(T& v) {                        
-            status test_flag_{status::fresh};
-            while (!status_flag_.compare_exchange_weak(test_flag_,status::busy,std::memory_order_release)) {
-                if (test_flag_ == status::busy) { 
-                    test_flag_ = status::fresh;
-                }                                 
-            } 
+    swap_object(T t)
+        : local_object_(std::move(t))
+        , status_flag_{ status::fresh }
+    {
+    }
+
+    swap_object(swap_object const&) = delete;
+    swap_object& operator=(swap_object const&) = delete;
+
+    void swap_in(T& v)
+    {
+        status test_flag_{ status::fresh };
+        while (!status_flag_.compare_exchange_weak(test_flag_, status::busy, std::memory_order_release)) {
+            if (test_flag_ == status::busy) {
+                test_flag_ = status::fresh;
+            }
+        }
+        // status_flag_ is now busy..
+        using std::swap;
+        swap(local_object_, v);
+        status_flag_.store(status::fresh, std::memory_order_release);
+        // status_flag_ is now fresh..
+    }
+
+    bool swap_out(T& v)
+    {
+        status test_flag_{ status::fresh };
+        if (status_flag_.compare_exchange_strong(test_flag_, status::busy, std::memory_order_release)) {
             // status_flag_ is now busy..
             using std::swap;
-            swap(local_object_,v);
-            status_flag_.store(status::fresh,std::memory_order_release); 
+            swap(local_object_, v);
+            status_flag_.store(status::stale, std::memory_order_release);
             // status_flag_ is now fresh..
+            return true; // swap occurred
         }
-
-        bool swap_out(T& v) {
-            status test_flag_{status::fresh};
-            if (status_flag_.compare_exchange_strong(test_flag_,status::busy,std::memory_order_release)) {
-                // status_flag_ is now busy..
-                using std::swap;
-                swap(local_object_,v);
-                status_flag_.store(status::stale,std::memory_order_release);
-                // status_flag_ is now fresh..
-                return true;  // swap occurred
-            }            
-            return false; // swap did not occur
-        }
-    };
+        return false; // swap did not occur
+    }
+};
 
 } // namespace
 #endif

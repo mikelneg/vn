@@ -11,21 +11,21 @@
 
 #include <cstddef>
 //#include <type_traits>
-#include <vn/has_equality_operator.h>
 #include <boost/variant.hpp>
+#include <vn/has_equality_operator.h>
 
-namespace vn {        
+namespace vn {
 namespace visitors {
-    
+
     template <typename T>
-    struct has_variant_type;     
+    struct has_variant_type;
     struct same_type;
     struct weak_equality; // if same type and operator== comparable, returns operator== result
-                          // if same type but not operator== comparable, returns true 
-                          // if different types, returns false
+    // if same type but not operator== comparable, returns true
+    // if different types, returns false
 
- // struct strict_equality; // as above, but if same type but not operator== comparable, returns false
-                    
+    // struct strict_equality; // as above, but if same type but not operator== comparable, returns false
+
     template <typename T>
     struct has_variant_type : boost::static_visitor<bool> {
         template <typename Q>
@@ -36,39 +36,38 @@ namespace visitors {
     struct same_type : boost::static_visitor<bool> {
         template <typename T, typename Q>
         constexpr bool operator()(T const&, Q const&) const { return false; }
-        
+
         template <typename T>
         constexpr bool operator()(T const&, T const&) const { return true; }
     };
 
     struct weak_equality : boost::static_visitor<bool> {
         template <typename T>
-        constexpr std::enable_if_t<vn::has_equality_operator<T>::value,bool> 
+        constexpr std::enable_if_t<vn::has_equality_operator<T>::value, bool>
         operator()(T const& lhs, T const& rhs) const { return lhs == rhs; }
 
         template <typename T>
-        constexpr std::enable_if_t<!vn::has_equality_operator<T>::value,bool> 
-        operator()(T const&, T const&) const { return true; }                
-  
+        constexpr std::enable_if_t<!vn::has_equality_operator<T>::value, bool>
+        operator()(T const&, T const&) const { return true; }
+
         template <typename T, typename Q>
-        constexpr bool 
+        constexpr bool
         operator()(T const&, Q const&) const { return false; }
     };
-    
+
     struct strong_equality : boost::static_visitor<bool> {
         template <typename T>
-        constexpr std::enable_if_t<vn::has_equality_operator<T>::value,bool> 
+        constexpr std::enable_if_t<vn::has_equality_operator<T>::value, bool>
         operator()(T const& lhs, T const& rhs) const { return lhs == rhs; }
 
         template <typename T>
-        constexpr std::enable_if_t<!vn::has_equality_operator<T>::value,bool> 
-        operator()(T const&, T const&) const { return false; }                
-  
+        constexpr std::enable_if_t<!vn::has_equality_operator<T>::value, bool>
+        operator()(T const&, T const&) const { return false; }
+
         template <typename T, typename Q>
-        constexpr bool 
+        constexpr bool
         operator()(T const&, Q const&) const { return false; }
     };
-
-}} // namespace
+}
+} // namespace
 #endif
-
