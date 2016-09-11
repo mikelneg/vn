@@ -1,13 +1,12 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #ifndef UAOBBWWGHGHHWEF_VN_SWAP_OBJECT_H_
 #define UAOBBWWGHGHHWEF_VN_SWAP_OBJECT_H_
-
-/*-----------------------------------------------------------------------------
-    Mikel Negugogor (http://github.com/mikelneg)                              
-    
-    namespace vn::
-    class swap_object
-
------------------------------------------------------------------------------*/
 
 #include <atomic>
 #include <memory>
@@ -18,8 +17,8 @@ template <typename T>
 class swap_object {
 
     enum class status { stale,
-        fresh,
-        busy };
+                        fresh,
+                        busy };
 
     std::atomic<status> status_flag_;
 
@@ -27,13 +26,12 @@ class swap_object {
 
 public:
     swap_object()
-        : status_flag_{ status::stale }
+        : status_flag_{status::stale}
     {
     }
 
     swap_object(T t)
-        : local_object_(std::move(t))
-        , status_flag_{ status::fresh }
+        : local_object_(std::move(t)), status_flag_{status::fresh}
     {
     }
 
@@ -42,9 +40,11 @@ public:
 
     void swap_in(T& v)
     {
-        status test_flag_{ status::fresh };
-        while (!status_flag_.compare_exchange_weak(test_flag_, status::busy, std::memory_order_release)) {
-            if (test_flag_ == status::busy) {
+        status test_flag_{status::fresh};
+        while (!status_flag_.compare_exchange_weak(test_flag_, status::busy, std::memory_order_release))
+        {
+            if (test_flag_ == status::busy)
+            {
                 test_flag_ = status::fresh;
             }
         }
@@ -57,8 +57,9 @@ public:
 
     bool swap_out(T& v)
     {
-        status test_flag_{ status::fresh };
-        if (status_flag_.compare_exchange_strong(test_flag_, status::busy, std::memory_order_release)) {
+        status test_flag_{status::fresh};
+        if (status_flag_.compare_exchange_strong(test_flag_, status::busy, std::memory_order_release))
+        {
             // status_flag_ is now busy..
             using std::swap;
             swap(local_object_, v);

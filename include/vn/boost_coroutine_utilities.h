@@ -1,15 +1,14 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #ifndef URUOWIOABVOWOIAF_VN_BOOST_COROUTINE_UTILITIES_H_
 #define URUOWIOABVOWOIAF_VN_BOOST_COROUTINE_UTILITIES_H_
 
-/*-----------------------------------------------------------------------------
-    Mikel Negugogor (http://github.com/mikelneg)                              
-    
-    namespace vn::coroutines:: 
-
-    utilities for boost::coroutines
------------------------------------------------------------------------------*/
-
-// #include <boost/coroutine/asymmetric_coroutine.hpp>
+#include <boost/coroutine/asymmetric_coroutine.hpp>
 #include <exception>
 
 namespace vn {
@@ -20,11 +19,16 @@ namespace coroutines {
     {
         return [func = std::move(func)](auto& yield)
         {
-            try {
+            try
+            {
                 func(yield);
-            } catch (boost::coroutines::detail::forced_unwind const&) { // this exception must propagate..
+            }
+            catch (boost::coroutines::detail::forced_unwind const&)
+            { // this exception must propagate..
                 throw;
-            } catch (...) {
+            }
+            catch (...)
+            {
             } // empty handler
         };
     }
@@ -37,10 +41,13 @@ namespace coroutines {
     template <typename T, typename... Args>
     void try_invoke(T& obj, Args&&... args)
     {
-        if (obj) {
+        if (obj)
+        {
             obj(std::forward<Args>(args)...);
-        } else {
-            throw std::runtime_error{ __func__ };
+        }
+        else
+        {
+            throw std::runtime_error{__func__};
         }
     }
 }

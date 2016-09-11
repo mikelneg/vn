@@ -1,14 +1,12 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #ifndef BAASFIWARRRAGG_VN_HAS_EQUALITY_OPERATOR_
 #define BAASFIWARRRAGG_VN_HAS_EQUALITY_OPERATOR_
-
-/*-----------------------------------------------------------------------------
-    Mikel Negugogor (http://github.com/mikelneg)                              
-    
-    namespace vn 
-
-    template <typename T, >
-    struct has_equality_operator; 
------------------------------------------------------------------------------*/
 
 #include <cstddef>
 #include <type_traits>
@@ -29,7 +27,10 @@ struct has_equality_operator {
     static no& check(...);
 
     static constexpr bool value = sizeof(check<T>(0)) == sizeof(yes);
-    constexpr operator bool() const { return value; }
+    constexpr operator bool() const
+    {
+        return value;
+    }
 };
 
 } // namespace

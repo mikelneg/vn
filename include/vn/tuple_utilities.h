@@ -1,14 +1,13 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #ifndef UTUOWOWPPQWE_VN_TUPLE_UTILITIES_H_
 #define UTUOWOWPPQWE_VN_TUPLE_UTILITIES_H_
 
-/*-----------------------------------------------------------------------------
-    Mikel Negugogor (http://github.com/mikelneg)                              
-
-    namespace vn
-
-    Utilities for std::tuple
-
------------------------------------------------------------------------------*/
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
@@ -36,7 +35,7 @@ namespace detail {
     template <typename... Args, std::size_t... Ns, typename F>
     void call_for_each_element_helper_(std::tuple<Args...> const& tuple_, std::index_sequence<Ns...>, F&& func)
     {
-        int discard[]{ 0, (std::forward<F>(func)(std::get<Ns>(tuple_)), 0)... };
+        int discard[]{0, (std::forward<F>(func)(std::get<Ns>(tuple_)), 0)...};
         (void)discard;
     }
 }

@@ -1,14 +1,15 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #ifndef TOWIWOIWJOPAJIG_VN_IS_VALID_H_
 #define TOWIWOIWJOPAJIG_VN_IS_VALID_H_
 
-/*-----------------------------------------------------------------------------
-    Mikel Negugogor (http://github.com/mikelneg)                                  
-    
-    namespace vn
-
-    is_valid(...)
-
------------------------------------------------------------------------------*/
+#include <type_traits>
+#include <utility>
 
 namespace vn {
 
@@ -41,7 +42,7 @@ namespace detail {
 template <typename F>
 constexpr auto is_valid(F f)
 {
-    return detail::check_valid_<detail::is_valid_<F> >{};
+    return detail::check_valid_<detail::is_valid_<F>>{};
 }
 
 } // namespaces

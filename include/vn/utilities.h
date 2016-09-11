@@ -1,13 +1,12 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #ifndef UERIIOWIWGGGAEF_VN_UTILITIES_H_
 #define UERIIOWIWGGGAEF_VN_UTILITIES_H_
-
-/*-----------------------------------------------------------------------------
-    Mikel Negugogor (http://github.com/mikelneg)                              
-    
-    namespace vn 
-
-    Various utilities..
------------------------------------------------------------------------------*/
 
 #include <cstddef>
 #include <type_traits>
@@ -32,7 +31,10 @@ namespace detail {
     template <int N>
     struct index_ {
         constexpr static int value = N;
-        constexpr operator int() const noexcept { return value; }
+        constexpr operator int() const noexcept
+        {
+            return value;
+        }
     };
 
     template <typename T, typename...>
@@ -60,7 +62,7 @@ namespace detail {
     };
 
     template <template <typename> typename Pred, template <typename> typename Map>
-    struct conditional_remap_<Pred, Map, void_type<typename Map<void>::type> > { // chosen if typename Map<void>::type is valid
+    struct conditional_remap_<Pred, Map, void_type<typename Map<void>::type>> { // chosen if typename Map<void>::type is valid
         template <typename Q>
         using applied_to = std::conditional_t<Pred<Q>::value, typename Map<Q>::type, Q>;
     };
@@ -77,33 +79,48 @@ struct size_of_pack {
 };
 
 template <template <typename...> typename TT, typename... Args>
-struct size_of_pack<TT<Args...> > {
+struct size_of_pack<TT<Args...>> {
     static constexpr std::size_t value = sizeof...(Args);
-    constexpr operator std::size_t() const { return sizeof...(Args); }
+    constexpr operator std::size_t() const
+    {
+        return sizeof...(Args);
+    }
 };
 
 template <typename T, typename... TArgs>
 struct index_of {
     constexpr static int value = detail::index_of_helper_<T, TArgs...>::template type<0>::value;
-    constexpr operator int() const noexcept { return value; }
+    constexpr operator int() const noexcept
+    {
+        return value;
+    }
 };
 
 template <typename T, template <typename...> typename TT, typename... TArgs>
-struct index_of<T, TT<TArgs...> > {
+struct index_of<T, TT<TArgs...>> {
     constexpr static int value = detail::index_of_helper_<T, TArgs...>::template type<0>::value;
-    constexpr operator int() const noexcept { return value; }
+    constexpr operator int() const noexcept
+    {
+        return value;
+    }
 };
 
 template <template <typename...> typename TT, typename... TArgs> // catches cases where TT<TArgs...> appears as first and second param,
-struct index_of<TT<TArgs...>, TT<TArgs...> > { // in which case we do not dig into TArgs...
+struct index_of<TT<TArgs...>, TT<TArgs...>> {                    // in which case we do not dig into TArgs...
     constexpr static int value = 0;
-    constexpr operator int() const noexcept { return value; }
+    constexpr operator int() const noexcept
+    {
+        return value;
+    }
 };
 
 template <typename C, typename T>
 struct contains {
     constexpr static const bool value = (index_of<T, C>::value > -1);
-    constexpr operator bool() const noexcept { return value; }
+    constexpr operator bool() const noexcept
+    {
+        return value;
+    }
 };
 
 template <typename T>

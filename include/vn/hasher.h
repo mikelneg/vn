@@ -1,23 +1,13 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #ifndef TUWUWOOAPWOWOWEEFEF_VN_HASHER_H_
 #define TUWUWOOAPWOWOWEEFEF_VN_HASHER_H_
 
-/*-----------------------------------------------------------------------------
-    Mikel Negugogor (http://github.com/mikelneg)                              
-
-    namespace vn
-
-    template <typename CombineFunctor>
-    class hasher;    
-    
-        hasher(std::size_t seed = {});
-        
-        template <typename ...Args>
-        hasher& operator()(Args const&...);
-
-        Note:   CombineFunctor::operator() should have type
-                    void operator()(std::size_t&, Arg const&) const
-
------------------------------------------------------------------------------*/
 #include <cstddef>
 
 namespace vn {
@@ -30,11 +20,14 @@ namespace detail {
 template <typename CombineFunctor> // CombineFunctor must satisfy the requirements listed above
 class hasher {
     static_assert(detail::is_combine_functor_<CombineFunctor>::value,
-        "static_assert triggered: CombineFunctor::operator() does not have the correct type.");
+                  "static_assert triggered: CombineFunctor::operator() does not have the correct type.");
     std::size_t seed{};
 
 public:
-    constexpr explicit hasher(std::size_t seed) noexcept : seed{ seed } {}
+    constexpr explicit hasher(std::size_t seed) noexcept
+        : seed{seed}
+    {
+    }
     hasher() = default;
     hasher(hasher const&) = default;
     hasher& operator=(hasher const&) = default;
@@ -43,14 +36,23 @@ public:
     hasher& operator()(Args const&... args)
     {
         using C = CombineFunctor;
-        int discard[]{ 0, ((C{}.*static_cast<void (C::*)(std::size_t&, decltype(args)) const>(&C::operator()))(seed, args), 0)... };
+        int discard[]{0, ((C{}.*static_cast<void (C::*)(std::size_t&, decltype(args)) const>(&C::operator()))(seed, args), 0)...};
         (void)discard;
         return *this; // ugly static_cast of &C::operator() to guarantee that it has the right signature
     }
 
-    constexpr bool operator==(hasher const& other) const noexcept { return seed == other.seed; }
-    constexpr explicit operator std::size_t() const noexcept { return seed; }
-    friend constexpr std::size_t hash_value(hasher const& h) noexcept { return h.seed; }
+    constexpr bool operator==(hasher const& other) const noexcept
+    {
+        return seed == other.seed;
+    }
+    constexpr explicit operator std::size_t() const noexcept
+    {
+        return seed;
+    }
+    friend constexpr std::size_t hash_value(hasher const& h) noexcept
+    {
+        return h.seed;
+    }
 };
 
 namespace detail {

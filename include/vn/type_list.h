@@ -1,10 +1,14 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #ifndef OQQQWEQEFVXCBBNNCC_VN_TYPE_LIST_H_
 #define OQQQWEQEFVXCBBNNCC_VN_TYPE_LIST_H_
 
-/*-----------------------------------------------------------------------------
-    Mikel Negugogor (http://github.com/mikelneg)
-
-    namespace vn
+/*-------------------------------------------------------------
     
     template <typename ...Args> struct type_list;    
 
@@ -21,7 +25,8 @@
       type_list<int,float>::each_satisfies<std::is_scalar> == std::true_type
       type_list<int,float>::any_satisfies<std::is_placeholder> == std::false_type
 
------------------------------------------------------------------------------*/
+-------------------------------------------------------------*/
+
 #include <type_traits>
 #include <vn/detail/type_list_detail.h>
 
@@ -31,7 +36,7 @@ template <typename... Args>
 struct type_list {
 
     template <typename... TArgs>
-    using filter = typename detail::compatibility_helper_filter_list_<type_list<TArgs...>, type_list<Args...> >::type;
+    using filter = typename detail::compatibility_helper_filter_list_<type_list<TArgs...>, type_list<Args...>>::type;
 
     template <typename... TArgs> // join appends any type, including type_lists
     using join = type_list<Args..., TArgs...>;

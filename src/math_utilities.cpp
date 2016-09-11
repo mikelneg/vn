@@ -1,3 +1,10 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #include "vn/math_utilities.h"
 #include <random>
 
@@ -10,22 +17,22 @@ namespace math {
         std::seed_seq const& gimme_seed_seq()
         {
             static std::random_device rd{};
-            static std::seed_seq seq{ rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd() };
+            static std::seed_seq seq{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
             return seq;
         }
     }
 
     float rand_zero_one()
     {
-        thread_local std::uniform_real_distribution<float> dist_{ 0.0f, 1.0f };
-        thread_local std::mt19937 rng_{ gimme_seed_seq() };
+        thread_local std::uniform_real_distribution<float> dist_{0.0f, 1.0f};
+        thread_local std::mt19937 rng_{gimme_seed_seq()};
         return dist_(rng_);
     }
 
     float rand_neg_one_one()
     {
-        thread_local std::uniform_real_distribution<float> dist_{ -1.0f, 1.0f };
-        thread_local std::mt19937 rng_{ gimme_seed_seq() };
+        thread_local std::uniform_real_distribution<float> dist_{-1.0f, 1.0f};
+        thread_local std::mt19937 rng_{gimme_seed_seq()};
         return dist_(rng_);
     }
 }

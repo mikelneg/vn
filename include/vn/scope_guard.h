@@ -1,14 +1,12 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #ifndef UUWOWFOBWSFF_VN_SCOPE_GUARD_H_
 #define UUWOWFOBWSFF_VN_SCOPE_GUARD_H_
-
-/*-----------------------------------------------------------------------------
-    Mikel Negugogor (http://github.com/mikelneg)                              
-
-    namespace vn
-         
-    class scope_guard<EnterFunc,ExitFunc>;
-    scope_guard<EnterFunc,ExitFunc> make_scope_guard(EnterFunc&&, ExitFunc&&);
------------------------------------------------------------------------------*/
 
 namespace vn {
 
@@ -17,9 +15,8 @@ class scope_guard {
     EnterFunc on_enter;
     ExitFunc on_exit;
 
-    scope_guard(EnterFunc on_enter, ExitFunc on_exit, int)
-        : on_enter{ std::move(on_enter) }
-        , on_exit{ std::move(on_exit) }
+    scope_guard(EnterFunc on_enter, ExitFunc on_exit, int) noexcept
+        : on_enter{std::move(on_enter)}, on_exit{std::move(on_exit)}
     {
     }
 
@@ -44,7 +41,7 @@ public:
 template <typename T, typename U>
 scope_guard<T, U> make_scope_guard(T on_enter, U on_exit)
 {
-    return { std::move(on_enter), std::move(on_exit) };
+    return {std::move(on_enter), std::move(on_exit)};
 }
 
 } // namespace

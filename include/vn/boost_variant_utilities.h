@@ -1,12 +1,15 @@
+/*-------------------------------------------------------------
+
+Copyright (c) 2016 Mikel Negugogor (http://github.com/mikelneg)
+MIT license. See LICENSE.txt in project root for details.
+
+---------------------------------------------------------------*/
+
 #ifndef HGHGJKWLFWWFFAS_VN_BOOST_UTILITIES_H_
 #define HGHGJKWLFWWFFAS_VN_BOOST_UTILITIES_H_
 
-/*-----------------------------------------------------------------------------
-    Mikel Negugogor (http://github.com/mikelneg)                              
-
-    namespace vn
-
-    Some utilities for Boost libraries:
+/*-------------------------------------------------------------
+    Some utilities for Boost's variant library:
     
     - std::vector<...> make_variant_vector<AdditionalTypes>(Args&&...args)
     - std::vector<...,Allocator> make_variant_vector_with_allocator(Allocator&&,Args&&...args)
@@ -28,7 +31,8 @@
     
     - zip_mpl_sequences<...> "zips" a sequence of mpl sequences into a vn::type_list<...> 
 
------------------------------------------------------------------------------*/
+-------------------------------------------------------------*/
+
 #include <cstddef>
 
 #include <vn/hasher.h>
@@ -53,7 +57,7 @@ auto make_variant_vector(Args&&... args)
     using ret_var = typename type_list<std::remove_reference_t<AdditionalTypes>..., std::remove_reference_t<Args>...>::unique::template discharge<boost::variant>;
     std::vector<ret_var> v;
     v.reserve(sizeof...(Args));
-    int discard[]{ 0, (v.emplace_back(std::forward<Args>(args)), 0)... };
+    int discard[]{0, (v.emplace_back(std::forward<Args>(args)), 0)...};
     (void)discard;
     return v;
 }
@@ -106,7 +110,7 @@ template <typename... Fs>
 constexpr auto make_lambda_visitor(Fs&&... fs)
 {
     using comp_func_type = decltype(vn::make_composite_function(std::forward<Fs>(fs)...));
-    return lambda_visitor<comp_func_type>{ std::forward<Fs>(fs)... };
+    return lambda_visitor<comp_func_type>{std::forward<Fs>(fs)...};
 }
 
 //template <typename...Fs>
@@ -117,13 +121,16 @@ constexpr auto make_lambda_visitor(Fs&&... fs)
 namespace detail {
     struct boost_hash_combine_functor {
         template <typename T>
-        void operator()(std::size_t& s, T const& t) const { ::boost::hash_combine(s, t); }
+        void operator()(std::size_t& s, T const& t) const
+        {
+            ::boost::hash_combine(s, t);
+        }
     };
 }
 
 // using boost_hasher = vn::hasher<detail::boost_hash_combine_functor>; // previously used a typedef.
 struct boost_hasher : vn::hasher<detail::boost_hash_combine_functor> { // the typedef was generating many annoying "decorated name length exceeded" warnings..
-    using vn::hasher<detail::boost_hash_combine_functor>::hasher; // now we just inherit from it and use its ctors.
+    using vn::hasher<detail::boost_hash_combine_functor>::hasher;      // now we just inherit from it and use its ctors.
 };
 
 namespace detail {
@@ -145,7 +152,7 @@ namespace detail {
     };
 
     template <typename... Args>
-    struct mpl_sequence_to_list_<boost::variant<Args...> > {
+    struct mpl_sequence_to_list_<boost::variant<Args...>> {
         using var_type = typename boost::variant<Args...>::types;
         using type = typename extract_MPL_sequence_<typename boost::mpl::begin<var_type>::type, typename boost::mpl::end<var_type>::type>::template type<>;
     };
@@ -169,8 +176,8 @@ namespace detail {
     };
 
     template <typename... Args>
-    struct list_from_T_or_variant_<boost::variant<Args...> > {
-        using type = typename detail::mpl_sequence_to_list_<boost::variant<Args...> >::type;
+    struct list_from_T_or_variant_<boost::variant<Args...>> {
+        using type = typename detail::mpl_sequence_to_list_<boost::variant<Args...>>::type;
     };
 
     template <typename... Args> // Args may be any T or boost::variant<...> types; boost::variant<...> types are flattened
@@ -182,7 +189,7 @@ namespace detail {
 template <typename VarType, typename T>
 using variant_contains = vn::contains<mpl_sequence_to_list<VarType>, T>;
 
-template <typename... Args> // might be redundant given variant_over<>...
+template <typename... Args>                                               // might be redundant given variant_over<>...
 using extended_variant = typename detail::common_variant_<Args...>::type; // Args must be boost::variant<...> types
 
 template <typename... Args>
