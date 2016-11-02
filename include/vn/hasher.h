@@ -19,13 +19,11 @@ namespace detail {
 
 template <typename CombineFunctor> // CombineFunctor must satisfy the requirements listed above
 class hasher {
-    static_assert(detail::is_combine_functor_<CombineFunctor>::value,
-                  "static_assert triggered: CombineFunctor::operator() does not have the correct type.");
+    static_assert(detail::is_combine_functor_<CombineFunctor>::value, "static_assert triggered: CombineFunctor::operator() does not have the correct type.");
     std::size_t seed{};
 
 public:
-    constexpr explicit hasher(std::size_t seed) noexcept
-        : seed{seed}
+    constexpr explicit hasher(std::size_t seed) noexcept : seed{seed}
     {
     }
     hasher() = default;

@@ -9,11 +9,11 @@ MIT license. See LICENSE.txt in project root for details.
 #define IIEIWOAASDSA_VN_FUNCTION_CALL_H_
 
 /*-------------------------------------------------------------
-    class function_call<...>;      
-    function_call<...> make_function_call(...); 
+    class function_call<...>;
+    function_call<...> make_function_call(...);
 
-    + hackish, not currently used 
-    - function_call<...> wraps a std::bind(...) object and stores a hash of 
+    + hackish, not currently used
+    - function_call<...> wraps a std::bind(...) object and stores a hash of
       the parameters
     - Uses default hasher vn::boost_hasher, which works with placeholder types
       and reference_wrapper<>
@@ -37,8 +37,7 @@ class function_call<F, HashType> : private F {
     std::size_t parameter_hash;
 
 public:
-    function_call(F&& f, std::size_t parameter_hash) noexcept(noexcept(F{std::move(f)}))
-        : F{std::move(f)}, parameter_hash{parameter_hash}
+    function_call(F&& f, std::size_t parameter_hash) noexcept(noexcept(F{std::move(f)})) : F{std::move(f)}, parameter_hash{parameter_hash}
     {
     }
 
@@ -222,26 +221,24 @@ template <typename Hasher = vn::boost_hasher, typename F, typename... Args>
 auto make_function_call(F&& func, Args&&... args)
 {
     std::size_t parameter_hash{Hasher{}(detail::filter_placeholders<typename std::remove_reference<Args>::type>{}(args)...)};
-    return function_call<decltype(std::bind(std::forward<F>(func), std::forward<Args>(args)...)),
-                         Hasher>{std::bind(std::forward<F>(func), std::forward<Args>(args)...), parameter_hash};
+    return function_call<decltype(std::bind(std::forward<F>(func), std::forward<Args>(args)...)), Hasher>{
+        std::bind(std::forward<F>(func), std::forward<Args>(args)...), parameter_hash};
 }
 
 template <typename Hasher = vn::boost_hasher, typename R, typename... PArgs, typename... Args>
 auto make_function_call(R (*func_ptr)(PArgs...), Args&&... args)
 {
     std::size_t parameter_hash{Hasher{}(detail::filter_placeholders<typename std::remove_reference<Args>::type>{}(args)...)};
-    return function_call<decltype(func_ptr),
-                         decltype(std::bind(func_ptr, std::forward<Args>(args)...)),
-                         Hasher>{std::bind(func_ptr, std::forward<Args>(args)...), func_ptr, parameter_hash};
+    return function_call<decltype(func_ptr), decltype(std::bind(func_ptr, std::forward<Args>(args)...)), Hasher>{
+        std::bind(func_ptr, std::forward<Args>(args)...), func_ptr, parameter_hash};
 }
 
 template <typename Hasher = vn::boost_hasher, typename R, typename C, typename... PArgs, typename... Args>
 auto make_function_call(R (C::*func_ptr)(PArgs...), Args&&... args)
 {
     std::size_t parameter_hash{Hasher{}(detail::filter_placeholders<typename std::remove_reference<Args>::type>{}(args)...)};
-    return function_call<decltype(func_ptr),
-                         decltype(std::bind(func_ptr, std::forward<Args>(args)...)),
-                         Hasher>{std::bind(func_ptr, std::forward<Args>(args)...), func_ptr, parameter_hash};
+    return function_call<decltype(func_ptr), decltype(std::bind(func_ptr, std::forward<Args>(args)...)), Hasher>{
+        std::bind(func_ptr, std::forward<Args>(args)...), func_ptr, parameter_hash};
 }
 
 } // namespace

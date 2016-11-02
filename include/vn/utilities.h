@@ -132,13 +132,13 @@ using identity = typename detail::identity_<T>::type;
 template <typename T, typename... Qs>
 using first_of = typename detail::first_of_helper_<T, Qs...>::type;
 
-//template <typename R, typename C, typename ...Args>
-//R return_type(R(C::*)(Args...));
+// template <typename R, typename C, typename ...Args>
+// R return_type(R(C::*)(Args...));
 //
-//template <typename R, typename ...Args>
-//R return_type(R(*)(Args...));
+// template <typename R, typename ...Args>
+// R return_type(R(*)(Args...));
 //
-//namespace detail {
+// namespace detail {
 //
 //    template <int...Ns>
 //    struct indx {

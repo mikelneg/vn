@@ -20,8 +20,7 @@ template <typename T>
 struct composite_function<T> : T {
 
     template <typename Q>
-    constexpr composite_function(Q&& q) noexcept(noexcept(T(std::forward<Q>(q))))
-        : T(std::forward<Q>(q))
+    constexpr composite_function(Q&& q) noexcept(noexcept(T(std::forward<Q>(q)))) : T(std::forward<Q>(q))
     {
     }
 

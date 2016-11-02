@@ -16,22 +16,18 @@ namespace vn {
 template <typename T>
 class swap_object {
 
-    enum class status { stale,
-                        fresh,
-                        busy };
+    enum class status { stale, fresh, busy };
 
     std::atomic<status> status_flag_;
 
     T local_object_;
 
 public:
-    swap_object()
-        : status_flag_{status::stale}
+    swap_object() : status_flag_{status::stale}
     {
     }
 
-    swap_object(T t)
-        : local_object_(std::move(t)), status_flag_{status::fresh}
+    swap_object(T t) : local_object_(std::move(t)), status_flag_{status::fresh}
     {
     }
 

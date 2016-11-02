@@ -15,8 +15,7 @@ class scope_guard {
     EnterFunc on_enter;
     ExitFunc on_exit;
 
-    scope_guard(EnterFunc on_enter, ExitFunc on_exit, int) noexcept
-        : on_enter{std::move(on_enter)}, on_exit{std::move(on_exit)}
+    scope_guard(EnterFunc on_enter, ExitFunc on_exit, int) noexcept : on_enter{std::move(on_enter)}, on_exit{std::move(on_exit)}
     {
     }
 
@@ -26,8 +25,7 @@ public:
 
     // we use a deferred constructor to guarantee that the dtor is
     // called even if on_enter() throws an exception
-    scope_guard(EnterFunc on_enter, ExitFunc on_exit)
-        : scope_guard(std::move(on_enter), std::move(on_exit), 0)
+    scope_guard(EnterFunc on_enter, ExitFunc on_exit) : scope_guard(std::move(on_enter), std::move(on_exit), 0)
     {
         on_enter();
     }

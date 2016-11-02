@@ -17,12 +17,10 @@ MIT license. See LICENSE.txt in project root for details.
 namespace vn {
 
 template <typename R, typename... Args>
-std::tuple<Args...>
-tuple_type_from_parameters(R (*)(Args...)); // no implementation
+std::tuple<Args...> tuple_type_from_parameters(R (*)(Args...)); // no implementation
 
 template <typename R, typename C, typename... Args>
-std::tuple<Args...>
-tuple_type_from_parameters(R (C::*)(Args...) const); // no implementation
+std::tuple<Args...> tuple_type_from_parameters(R (C::*)(Args...) const); // no implementation
 
 namespace detail {
 

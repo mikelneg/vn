@@ -55,8 +55,7 @@ class work_thread {
         std::atomic<sig>& state_;
 
     public:
-        work_request(std::atomic<sig>& s) noexcept
-            : state_{s}
+        work_request(std::atomic<sig>& s) noexcept : state_{s}
         {
         }
         work_request(work_request&&) = delete;
@@ -78,8 +77,7 @@ class work_thread {
         bool state_consumed_{false};
 
     public:
-        work_ready(std::atomic<sig>& s, std::condition_variable& c) noexcept
-            : state_{s}, cv_{c}
+        work_ready(std::atomic<sig>& s, std::condition_variable& c) noexcept : state_{s}, cv_{c}
         {
         }
         work_ready(work_ready&&) = delete;
@@ -144,15 +142,12 @@ public:
     work_thread& operator=(work_thread&&) = delete; // no assigning
 
     template <typename F, typename H>
-    work_thread(F&& func, H&& exception_handler)
-        : quit_{false}, state_{sig::null_state}
+    work_thread(F&& func, H&& exception_handler) : quit_{false}, state_{sig::null_state}
     {
         std::promise<void> prom_;
         std::future<void> started_ = prom_.get_future();
-        thread_ = std::thread{[this](auto&&... ps) {
-                                  this->dowork(std::forward<decltype(ps)>(ps)...);
-                              },
-                              std::forward<F>(func), std::forward<H>(exception_handler), std::move(prom_)};
+        thread_ = std::thread{[this](auto&&... ps) { this->dowork(std::forward<decltype(ps)>(ps)...); }, std::forward<F>(func),
+                              std::forward<H>(exception_handler), std::move(prom_)};
         // ...
         started_.get();
         std::unique_lock<std::mutex> lock_{mutex_};

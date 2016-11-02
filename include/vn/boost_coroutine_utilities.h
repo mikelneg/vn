@@ -8,7 +8,7 @@ MIT license. See LICENSE.txt in project root for details.
 #ifndef URUOWIOABVOWOIAF_VN_BOOST_COROUTINE_UTILITIES_H_
 #define URUOWIOABVOWOIAF_VN_BOOST_COROUTINE_UTILITIES_H_
 
-#include <boost/coroutine/asymmetric_coroutine.hpp>
+#include <boost/coroutine2/coroutine.hpp>
 #include <exception>
 
 namespace vn {
@@ -23,8 +23,12 @@ namespace coroutines {
             {
                 func(yield);
             }
-            catch (boost::coroutines::detail::forced_unwind const&)
-            { // this exception must propagate..
+            catch (boost::coroutines2::detail::forced_unwind const&)
+            {
+                throw;
+            }
+            catch (boost::context::detail::forced_unwind const&)
+            {
                 throw;
             }
             catch (...)
@@ -35,7 +39,12 @@ namespace coroutines {
 
     inline auto make_empty_coroutine()
     {
-        return make_trycatch_coroutine([](auto& yield) { while (true) { yield(); } });
+        return make_trycatch_coroutine([](auto& yield) {
+            while (true)
+            {
+                yield();
+            }
+        });
     }
 
     template <typename T, typename... Args>

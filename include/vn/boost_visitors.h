@@ -38,6 +38,12 @@ namespace visitors {
         }
     };
 
+    template <typename T, typename R>
+    bool has_type(R const& r)
+    {
+        return has_variant_type<T>{}(r);
+    }
+
     struct same_type : boost::static_visitor<bool> {
         template <typename T, typename Q>
         constexpr bool operator()(T const&, Q const&) const
@@ -54,22 +60,19 @@ namespace visitors {
 
     struct weak_equality : boost::static_visitor<bool> {
         template <typename T>
-        constexpr std::enable_if_t<vn::has_equality_operator<T>::value, bool>
-        operator()(T const& lhs, T const& rhs) const
+        constexpr std::enable_if_t<vn::has_equality_operator<T>::value, bool> operator()(T const& lhs, T const& rhs) const
         {
             return lhs == rhs;
         }
 
         template <typename T>
-        constexpr std::enable_if_t<!vn::has_equality_operator<T>::value, bool>
-        operator()(T const&, T const&) const
+        constexpr std::enable_if_t<!vn::has_equality_operator<T>::value, bool> operator()(T const&, T const&) const
         {
             return true;
         }
 
         template <typename T, typename Q>
-        constexpr bool
-        operator()(T const&, Q const&) const
+        constexpr bool operator()(T const&, Q const&) const
         {
             return false;
         }
@@ -77,22 +80,19 @@ namespace visitors {
 
     struct strong_equality : boost::static_visitor<bool> {
         template <typename T>
-        constexpr std::enable_if_t<vn::has_equality_operator<T>::value, bool>
-        operator()(T const& lhs, T const& rhs) const
+        constexpr std::enable_if_t<vn::has_equality_operator<T>::value, bool> operator()(T const& lhs, T const& rhs) const
         {
             return lhs == rhs;
         }
 
         template <typename T>
-        constexpr std::enable_if_t<!vn::has_equality_operator<T>::value, bool>
-        operator()(T const&, T const&) const
+        constexpr std::enable_if_t<!vn::has_equality_operator<T>::value, bool> operator()(T const&, T const&) const
         {
             return false;
         }
 
         template <typename T, typename Q>
-        constexpr bool
-        operator()(T const&, Q const&) const
+        constexpr bool operator()(T const&, Q const&) const
         {
             return false;
         }
